@@ -22,7 +22,14 @@ jobs:
       - name: Build
         working-directory: app
         run: |
+          cp -r android/app/src/main /tmp/main_backup
+          rm -f android/build.gradle* android/settings.gradle* android/gradle.properties android/app/build.gradle*
+          rm -rf android/gradle
           flutter create --platforms=android --org com.example --project-name selfblock .
+          rm -rf android/app/src/main
+          cp -r /tmp/main_backup android/app/src/main
+          sed -i -E 's/minSdk(Version)?( =)? ?flutter\.minSdkVersion/minSdk = 29/' android/app/build.gradle*
+          grep -n "minSdk\|applicationId\|namespace" android/app/build.gradle*
           flutter pub get
           flutter build apk --release
       - uses: actions/upload-artifact@v4
